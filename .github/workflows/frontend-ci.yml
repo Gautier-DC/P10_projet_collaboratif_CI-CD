@@ -1,0 +1,57 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'front/**'
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'front/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Required for SonarCloud analysis
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+        cache: 'npm'
+        cache-dependency-path: 'front/package-lock.json'
+
+    - name: Install dependencies
+      run: |
+        cd front
+        npm install
+
+    - name: Build Angular
+      run: |
+        cd front
+        npm run build
+
+    - name: Run tests
+      run: |
+        cd front
+        npm run test -- --watch=false --code-coverage
+
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.projectKey=YOUR_PROJECT_KEY
+          -Dsonar.organization=YOUR_ORG_KEY
+          -Dsonar.sources=front/src
+          -Dsonar.tests=front/src
+          -Dsonar.exclusions=**/node_modules/**,**/*.spec.ts
+          -Dsonar.typescript.lcov.reportPaths=front/coverage/lcov.info
