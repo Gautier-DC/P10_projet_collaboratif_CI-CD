@@ -44,8 +44,8 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       with:
         args: >
-          -Dsonar.projectKey=YOUR_PROJECT_KEY
-          -Dsonar.organization=YOUR_ORG_KEY
+          -Dsonar.projectKey=Gautier-DC_P10_projet_collaboratif_CI-CD
+          -Dsonar.organization=gautier-dc
           -Dsonar.sources=back/src/main
           -Dsonar.tests=back/src/test
           -Dsonar.java.binaries=back/target/classes
