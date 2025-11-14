@@ -1,4 +1,4 @@
-name: Frontend CI/CD
+name: Frontend CI
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
     paths:
       - 'front/**'
       - '.github/workflows/frontend-ci.yml'
+      - 'sonar-project.properties'
   pull_request:
     branches: [ main, develop ]
     paths:
@@ -18,7 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        fetch-depth: 0  # Required for SonarCloud analysis
+        fetch-depth: 0
 
     - name: Set up Node.js
       uses: actions/setup-node@v3
@@ -32,7 +33,7 @@ jobs:
         cd front
         npm install
 
-    - name: Build Angular
+    - name: Build
       run: |
         cd front
         npm run build
@@ -40,18 +41,10 @@ jobs:
     - name: Run tests
       run: |
         cd front
-        npm run test -- --watch=false --code-coverage
+        npm run test -- --watch=false --code-coverage --browsers=ChromeHeadless
 
-    - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@master
+    - name: SonarCloud scan
+      uses: SonarSource/sonarqube-scan-action@v6
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      with:
-        args: >
-          -Dsonar.projectKey=Gautier-DC_P10_projet_collaboratif_CI-CD
-          -Dsonar.organization=gautier-dc
-          -Dsonar.sources=front/src
-          -Dsonar.tests=front/src
-          -Dsonar.exclusions=**/node_modules/**,**/*.spec.ts
-          -Dsonar.typescript.lcov.reportPaths=front/coverage/lcov.info
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
