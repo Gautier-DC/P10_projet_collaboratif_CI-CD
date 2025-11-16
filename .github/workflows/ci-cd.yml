@@ -57,20 +57,34 @@ jobs:
         cd front
         npm run test -- --watch=false --code-coverage
 
-    # SonarCloud Analysis (Backend + Frontend)
-    - name: SonarCloud Scan
+    # SonarCloud Analysis - Backend
+    - name: SonarCloud Scan Backend
       uses: SonarSource/sonarcloud-github-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       with:
         args: >
-          -Dsonar.projectKey=Gautier-DC_P10_projet_collaboratif_CI-CD
+          -Dsonar.projectKey=Gautier-DC_P10_backend
           -Dsonar.organization=gautier-dc
-          -Dsonar.sources=front/src,back/src/main
-          -Dsonar.tests=back/src/test,front/src
-          -Dsonar.test.inclusions=**/*.spec.ts,**/src/test/**
-          -Dsonar.exclusions=**/node_modules/**,**/*.spec.ts,**/target/**
-          -Dsonar.typescript.lcov.reportPaths=front/coverage/lcov.info
+          -Dsonar.sources=back/src/main
+          -Dsonar.tests=back/src/test
+          -Dsonar.exclusions=**/target/**
           -Dsonar.coverage.jacoco.xmlReportPaths=back/target/site/jacoco/jacoco.xml
           -Dsonar.java.binaries=back/target/classes
+
+    # SonarCloud Analysis - Frontend
+    - name: SonarCloud Scan Frontend
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        args: >
+          -Dsonar.projectKey=Gautier-DC_P10_frontend
+          -Dsonar.organization=gautier-dc
+          -Dsonar.sources=front/src
+          -Dsonar.tests=front/src
+          -Dsonar.test.inclusions=**/*.spec.ts
+          -Dsonar.exclusions=**/node_modules/**,**/*.spec.ts
+          -Dsonar.typescript.lcov.reportPaths=front/coverage/lcov.info
